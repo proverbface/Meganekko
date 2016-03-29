@@ -43,7 +43,6 @@ import com.eje_c.meganekko.event.SwipeForwardEvent;
 import com.eje_c.meganekko.event.SwipeUpEvent;
 import com.eje_c.meganekko.event.TouchDoubleEvent;
 import com.eje_c.meganekko.event.TouchSingleEvent;
-import com.eje_c.meganekko.utility.DockEventReceiver;
 import com.eje_c.meganekko.utility.Log;
 import com.eje_c.meganekko.xml.XmlSceneParser;
 import com.eje_c.meganekko.xml.XmlSceneParserFactory;
@@ -65,12 +64,8 @@ import ovr.App;
  */
 public class MeganekkoActivity extends VrActivity {
 
-    private static final String TAG = Log.tag(MeganekkoActivity.class);
-
     private final Queue<Runnable> mRunnables = new LinkedBlockingQueue<Runnable>();
-    private InternalSensorManager mInternalSensorManager;
     private VrContext mVrContext = null;
-    private boolean mDocked;
     private VrFrame vrFrame;
     private EventBus mEventBus = EventBus.builder().logNoSubscriberMessages(false).build();
     private Scene mScene;
@@ -112,24 +107,9 @@ public class MeganekkoActivity extends VrActivity {
 
         setAppPtr(nativeSetAppInterface(this, fromPackageNameString, commandString, uriString));
 
-        mDockEventReceiver = new DockEventReceiver(this, mRunOnDock, mRunOnUndock);
-        mInternalSensorManager = new InternalSensorManager(this, getAppPtr());
-
         mVrContext = new VrContext(this);
         mMaterialShaderManager = new MaterialShaderManager(mVrContext);
         mApp = new App(getAppPtr());
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mDockEventReceiver.stop();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mDockEventReceiver.start();
     }
 
     /**
@@ -140,10 +120,6 @@ public class MeganekkoActivity extends VrActivity {
         setScene(new Scene(mVrContext));
         setShaderManager(getAppPtr(), getMaterialShaderManager().getNative());
         mVrContext.onSurfaceCreated();
-
-        if (!mDocked) {
-            mInternalSensorManager.start();
-        }
 
         oneTimeInit(mVrContext);
     }
@@ -190,11 +166,6 @@ public class MeganekkoActivity extends VrActivity {
      * Called from native AppInterface::oneTimeShutDown().
      */
     private void oneTimeShutDown() {
-
-        if (!mDocked) {
-            mInternalSensorManager.stop();
-        }
-
         oneTimeShutDown(mVrContext);
     }
 
@@ -341,23 +312,6 @@ public class MeganekkoActivity extends VrActivity {
     public void onTouchDouble() {
         mEventBus.post(new TouchDoubleEvent());
     }
-
-    private final Runnable mRunOnDock = new Runnable() {
-        @Override
-        public void run() {
-            mDocked = true;
-            mInternalSensorManager.stop();
-        }
-    };
-
-    private final Runnable mRunOnUndock = new Runnable() {
-        @Override
-        public void run() {
-            mDocked = false;
-        }
-    };
-
-    private DockEventReceiver mDockEventReceiver;
 
     /**
      * Enqueues a callback to be run in the GL thread.
