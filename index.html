@@ -35,35 +35,18 @@
 <p>Add repository URL in project's root <strong>build.gradle</strong>.</p>
 
 <div class="highlight highlight-source-groovy-gradle"><pre><span class="pl-c">// Top-level build file where you can add configuration options common to all sub-projects/modules.</span>
-
-<span class="pl-en">buildscript</span> {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath <span class="pl-s"><span class="pl-pds">'</span>com.android.tools.build:gradle:2.0.0<span class="pl-pds">'</span></span>
-
-        <span class="pl-c">// NOTE: Do not place your application dependencies here; they belong</span>
-        <span class="pl-c">// in the individual module build.gradle files</span>
-    }
-}
-
 <span class="pl-en">allprojects</span> {
     repositories {
         jcenter()
         maven { url <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>http://ejeinc.github.io/Meganekko/repository<span class="pl-pds">'</span></span> } <span class="pl-c">// Add this line</span>
     }
-}
-
-task <span class="pl-en">clean</span>(<span class="pl-c1">type</span>: <span class="pl-k">Delete</span>) {
-    delete rootProject<span class="pl-k">.</span>buildDir
 }</pre></div>
 
 <p>Add dependency in module's <strong>build.gradle</strong>.</p>
 
 <div class="highlight highlight-source-groovy-gradle"><pre><span class="pl-en">dependencies</span> {
     compile fileTree(<span class="pl-c1">dir</span>: <span class="pl-s"><span class="pl-pds">'</span>libs<span class="pl-pds">'</span></span>, <span class="pl-c1">include</span>: [<span class="pl-s"><span class="pl-pds">'</span>*.jar<span class="pl-pds">'</span></span>])
-    compile <span class="pl-s"><span class="pl-pds">'</span>com.eje_c:meganekko:2.0.12<span class="pl-pds">'</span></span> <span class="pl-c">// Add this line</span>
+    compile <span class="pl-s"><span class="pl-pds">'</span>com.eje_c:meganekko:2.0.15<span class="pl-pds">'</span></span> <span class="pl-c">// Add this line</span>
 }</pre></div>
 
 <p>Click "Sync Now".</p>
